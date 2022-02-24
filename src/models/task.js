@@ -1,8 +1,7 @@
 const mongoose = require("mongoose")
 
-const Task = mongoose.model
+const taskSchema = new mongoose.Schema
 (
-    "Task",
     {
         description: 
         {
@@ -17,6 +16,8 @@ const Task = mongoose.model
         }
     }
 )
+
+const Task = mongoose.model("Task", taskSchema)
 
 module.exports = Task
 
