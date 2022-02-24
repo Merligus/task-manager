@@ -1,5 +1,6 @@
 const express = require("express")
 const User = require("./../models/user")
+const auth = require("./../middleware/auth")
 const router = new express.Router()
 
 router.post
@@ -12,7 +13,8 @@ router.post
         try
         {
             await user.save()
-            res.status(201).send(user)
+            const token = await user.generateAuthToken()
+            res.status(201).send({user, token})
         }
         catch (e)
         {
@@ -21,15 +23,60 @@ router.post
     }
 )
 
-router.get
+router.post
 (
-    "/users",
+    "/users/login",
     async (req, res) =>
     {
         try
         {
-            const users = await User.find({})
-            res.status(202).send(users)
+            const user = await User.findByCredentials(req.body.email, req.body.password)
+            const token = await user.generateAuthToken()
+            res.send({user, token})
+        }
+        catch (e)
+        {
+            res.status(400).send()
+        }
+    }
+)
+
+router.post
+(
+    "/users/logout",
+    auth,
+    async (req, res) =>
+    {
+        try
+        {
+            req.user.tokens = req.user.tokens.filter
+            (
+                (token) =>
+                {
+                    return token.token !== req.token
+                }
+            )
+            await req.user.save()
+            res.send()
+        }
+        catch (e)
+        {
+            res.status(500).send()
+        }
+    }
+)
+
+router.post
+(
+    "/users/logoutAll",
+    auth,
+    async (req, res) =>
+    {
+        try
+        {
+            req.user.tokens = []
+            await req.user.save()
+            res.send()
         }
         catch (e)
         {
@@ -40,28 +87,39 @@ router.get
 
 router.get
 (
-    "/users/:id",
+    "/users/me",
+    auth,
     async (req, res) =>
     {
+        res.send(req.user)
+    }
+)
 
-        try
-        {
-            const user = await User.findById(req.params.id)
-            if (!user)
-                return res.status(404).send()
+// router.get
+// (
+//     "/users/:id",
+//     async (req, res) =>
+//     {
+
+//         try
+//         {
+//             const user = await User.findById(req.params.id)
+//             if (!user)
+//                 return res.status(404).send()
             
-            res.send(user)
-        }
-        catch (e)
-        {
-            res.status(500).send()
-        }
-    }
-)
+//             res.send(user)
+//         }
+//         catch (e)
+//         {
+//             res.status(500).send()
+//         }
+//     }
+// )
 
 router.patch
 (
-    "/users/:id",
+    "/users/me",
+    auth,
     async (req, res) =>
     {
         const updates = Object.keys(req.body)
@@ -73,23 +131,23 @@ router.patch
 
         try
         {
-            const user = await User.findById(req.params.id)
+            // const user = await User.findById(req.params.id)
             // const user = await User.findByIdAndUpdate(req.params.id, req.body, {new: true, runValidators: true})
 
             updates.forEach
             (
                 (update) =>
                 {
-                    user[update] = req.body[update]
+                    req.user[update] = req.body[update]
                 }
             )
 
-            await user.save()
+            await req.user.save()
 
-            if (!user)
+            if (!req.user)
                 return res.status(404).send()
 
-            res.send(user)
+            res.send(req.user)
         }
         catch (e)
         {
@@ -100,17 +158,14 @@ router.patch
 
 router.delete
 (
-    "/users/:id",
+    "/users/me",
+    auth,
     async (req, res) =>
     {
         try
         {
-            const user = await User.findByIdAndDelete(req.params.id)
-    
-            if (!user)
-                return res.status(404).send()
-    
-            res.send(user)
+            await req.user.remove()
+            res.send(req.user)
         }
         catch (e)
         {
