@@ -1,5 +1,15 @@
 # task-manager
-Simple REST API using Node.js, Express, MongoDB and Mongoose.
+Simple REST API using Node.js. Using Express to route and MongoDB with Mongoose to register data on the database, the API is able to:
+
+- Sign up a new user
+- Log in and log out an existing user
+- Keep the user authenticated
+- Log out of all authenticated tokens of an existing user
+- Update and delete the user
+- Upload and delete images related to the user on the database
+- Create, get, update and delete a task related to an user
+
+With all these features beeing tested using Jest. The app is also available at [merligus-task-manager.herokuapp.com](https://merligus-task-manager.herokuapp.com) but you can install in your machine following the next steps:
 
 1. Clone the repository
    ```sh
@@ -23,5 +33,9 @@ Simple REST API using Node.js, Express, MongoDB and Mongoose.
       ```sh
       npm run start
       ```
-5. Access the web server in your browser at [localhost:3000](http://localhost:3000)
+   3. Or run the tests
+      ```sh
+      npm test
+      ```
+5. Access the API in your browser at [localhost:3000](http://localhost:3000)
 
