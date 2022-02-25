@@ -8,7 +8,7 @@ Simple REST API using Node.js, Express, MongoDB and Mongoose.
    ```
 2. Initiate MongoDB database at MongoDB/mongodb/bin with:
    ```sh
-   .\\mongod.exe --dbpath=/Users/Pichau/Documents/MongoDB/mongodb-data
+   .\\mongod.exe --dbpath=/MongoDB/mongodb-data
    ```
 3. Install dependencies (considering you already have npm installed)
    ```sh
